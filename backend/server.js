@@ -2,6 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const promptTina = require("./promptTina");
 
 const app = express();
 app.use(express.json());
@@ -27,9 +28,9 @@ async function generateTinaReply(prompt) {
   // init chat session
   const chat = await model.startChat({
     history: [],
-    config: {
-      systemInstruction:
-        "You are Tina, a playful but helpful cat assistant. response something not more than 10 sentences",
+    systemInstruction: {
+      role: "system",
+      parts: [{ text: promptTina }],
     },
   });
   const result = await chat.sendMessage(prompt);
@@ -57,7 +58,10 @@ app.post("/recommendation", async (req, res) => {
     res.status(200).json({ reply: TinasReply });
   } catch (error) {
     // error handling
-    console.error("❌ error generating recommendation ");
+    console.error(
+      "❌ error generating recommendation ",
+      error.message || error
+    );
     res.status(400).json({ error: "⚠️ Failed to generate recommendation" });
   }
 });
