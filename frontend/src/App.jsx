@@ -1,7 +1,13 @@
 import "./App.css";
+import LogoButton from "./components/LogoButton";
 
 function App() {
-  return <>mission 4 starts here </>;
+  return (
+    <>
+      <LogoButton />
+      mission 4 starts here
+    </>
+  );
 }
 
 export default App;
