@@ -47,9 +47,9 @@ export default function ChatBox() {
     // chatbox container
     <div>
       {/* pop up */}
-      <div className="relative bg-white w-150 rounded-3xl shadow-2xl overflow-hidden">
+      <div className="flex flex-col h-[600px] bg-white w-150 rounded-3xl shadow-2xl overflow-hidden">
         {/* CHATBOX HEADER */}
-        <div className="relative flex items-center justify-between bg-fuchsia-600 text-white py-4 px-6">
+        <div className="flex relative items-center justify-between bg-fuchsia-600 text-white py-4 px-6">
           {/* header info */}
           <div className="flex items-center gap-[10px] ">
             {/* Tina's profile pic */}
@@ -64,9 +64,9 @@ export default function ChatBox() {
         </div>
 
         {/* CHATBOX BODY */}
-        <div className="flex  flex-col gap-[20px] h-150 overflow-y-auto py-4 px-6">
+        <div className="flex-grow gap-[5px] overflow-y-auto py-4 px-6 scroll-smooth">
           {/* message - bot message */}
-          <div className="flex items-center gap-[11px] max-w-[75%] px-2 py-2 ">
+          <div className="flex items-center gap-[11px] max-w-[75%] px-2 py-2 text-sm ">
             <div className="py-2 px-2 bg-indigo-300 rounded-tl-[18px] rounded-tr-[18px] rounded-br-[18px] text-white ">
               <p className="break-words whitespace-pre-line">
                 Hi! How can I help you today?
@@ -83,7 +83,7 @@ export default function ChatBox() {
         </div>
 
         {/* CHATBOX FOOTER */}
-        <div className="absolute bottom-0 w-[100%] bg-white pt-[15px] pr-[22px] pb-[20px] pl-[22px]">
+        <div className="bg-white pt-[15px] pr-[22px] pb-[20px] pl-[22px]">
           {/* passing setChatHistory as a prop */}
           <ChatForm
             chatHistory={chatHistory}

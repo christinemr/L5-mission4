@@ -54,7 +54,7 @@ export default function ChatForm({
           type="text"
           placeholder="enter your message here."
           required
-          className="border-none outline-none bg-none w-[100%] h-[45px] py-0 px-[17px]"
+          className="border-none outline-none bg-none w-[100%] h-[45px] text-sm py-0 px-[17px]"
         />
         <button
           type="submit"
