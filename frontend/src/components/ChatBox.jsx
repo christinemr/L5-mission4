@@ -3,7 +3,7 @@ import ChatBotLogo from "./ChatBotLogo";
 import ChatForm from "./ChatForm";
 import ChatMessage from "./ChatMessage";
 
-export default function ChatBox() {
+export default function ChatBox({ onClose }) {
   const [chatHistory, setChatHistory] = useState([]);
   const bottomRef = useRef(null);
 
@@ -58,7 +58,10 @@ export default function ChatBox() {
               Tina - The Turner's Chatbot
             </h2>
           </div>
-          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 hover:bg-fuchsia-200">
+          <button
+            onClick={onClose}
+            className="btn btn-md text-xl btn-circle btn-ghost absolute right-2 top-2 hover:bg-fuchsia-200"
+          >
             x
           </button>
         </div>
