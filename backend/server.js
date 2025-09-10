@@ -14,7 +14,7 @@ require("dotenv").config();
 const API_KEY = process.env.GEMINI_API_KEY;
 
 // middleware
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: "http://localhost:5174" }));
 
 // init Gemini client
 const generativeAI = new GoogleGenerativeAI(API_KEY);
@@ -23,9 +23,7 @@ const generativeAI = new GoogleGenerativeAI(API_KEY);
 const model = generativeAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
 // define Tina's persona //
-// TODO: add prompt message under systemInstruction
-async function generateTinaReply(prompt) {
-  // init chat session
+async function generateTinaReply(userText) {
   const chat = await model.startChat({
     history: [],
     systemInstruction: {
@@ -33,17 +31,23 @@ async function generateTinaReply(prompt) {
       parts: [{ text: promptTina }],
     },
   });
-  const result = await chat.sendMessage(prompt);
+
+  console.log("👉 Sending to Gemini:", userText);
+  console.log("Type of userText:", typeof userText);
+
+  const result = await chat.sendMessage(userText);
+
   return result.response.text();
 }
 
 // endpoint
 app.post("/recommendation", async (req, res) => {
   // from frontend but update as needed
-  const { prompt } = req.body;
+  const { content } = req.body;
   console.log("Incoming request body:", req.body);
+  console.log("Type of content:", typeof content);
 
-  if (!prompt) {
+  if (!content) {
     console.error("⚠️ missing input!");
     return res.status(400).json({ error: "missing input! Please try again" });
   }
@@ -51,7 +55,7 @@ app.post("/recommendation", async (req, res) => {
   try {
     // generate AI response & reply
     // sends prompt to Gemini
-    const TinasReply = await generateTinaReply(prompt);
+    const TinasReply = await generateTinaReply(content);
     console.log({ TinasReply });
 
     // send res to frontend
