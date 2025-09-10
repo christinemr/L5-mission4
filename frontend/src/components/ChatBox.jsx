@@ -1,12 +1,52 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ChatBotLogo from "./ChatBotLogo";
 import ChatForm from "./ChatForm";
+import ChatMessage from "./ChatMessage";
 
 export default function ChatBox() {
+  const [chatHistory, setChatHistory] = useState([]);
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatHistory]);
+
+  const generateTinasResponse = async (history) => {
+    console.log(history);
+    try {
+      const latestUserMessage = history
+        .filter((h) => h.role === "user")
+        .pop()?.text;
+
+      if (!latestUserMessage) {
+        throw new Error("No user message found.");
+      }
+
+      // send to backend
+      const res = await fetch("http://localhost:3000/recommendation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: latestUserMessage }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok)
+        throw new Error(
+          data.error.message || "Something not quite right here. "
+        );
+
+      console.log(data);
+      return data.reply;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     // chatbox container
     <div>
-      {/* chatbox pop up */}
+      {/* pop up */}
       <div className="relative bg-white w-150 rounded-3xl shadow-2xl overflow-hidden">
         {/* CHATBOX HEADER */}
         <div className="relative flex items-center justify-between bg-fuchsia-600 text-white py-4 px-6">
@@ -27,28 +67,29 @@ export default function ChatBox() {
         <div className="flex  flex-col gap-[20px] h-150 overflow-y-auto py-4 px-6">
           {/* message - bot message */}
           <div className="flex items-center gap-[11px] max-w-[75%] px-2 py-2 ">
-            <div className="py-2 px-2 bg-indigo-300 rounded-tl-[18px] rounded-tr-[18px] rounded-br-[18px text-white ">
-              <p className="break-words white-space: pre-line">
-                Hi! How can I help you today? Lemme tell you something about
-                weather forecast.
+            <div className="py-2 px-2 bg-indigo-300 rounded-tl-[18px] rounded-tr-[18px] rounded-br-[18px] text-white ">
+              <p className="break-words whitespace-pre-line">
+                Hi! How can I help you today?
               </p>
             </div>
           </div>
 
-          {/* message - user's message */}
-          <div className="flex flex-col items-end gap-[11px] px-2 py-2 ">
-            <div className="py-2 px-2 bg-indigo-100 rounded-tl-[18px] rounded-tr-[18px] rounded-bl-[18px] max-w-[75%] ">
-              <p className="break-words white-space: pre-line">
-                Test test this is user's reply Test test this is user's reply
-                Test test this is user's reply Test test this is user's reply
-              </p>
-            </div>
-          </div>
+          {/* render chat history */}
+          {chatHistory.map((chat, index) => {
+            return <ChatMessage key={index} chat={chat} />;
+          })}
+          {/* scroll anchor */}
+          <div ref={bottomRef} />
         </div>
 
         {/* CHATBOX FOOTER */}
         <div className="absolute bottom-0 w-[100%] bg-white pt-[15px] pr-[22px] pb-[20px] pl-[22px]">
-          <ChatForm />
+          {/* passing setChatHistory as a prop */}
+          <ChatForm
+            chatHistory={chatHistory}
+            setChatHistory={setChatHistory}
+            generateTinasResponse={generateTinasResponse}
+          />
         </div>
       </div>
     </div>

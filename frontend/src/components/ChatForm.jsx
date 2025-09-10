@@ -1,13 +1,56 @@
-import React from "react";
+import React, { useRef } from "react";
 
-export default function ChatForm() {
+export default function ChatForm({
+  chatHistory,
+  setChatHistory,
+  generateTinasResponse,
+}) {
+  const inputRef = useRef();
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    const userMessage = inputRef.current.value.trim();
+    if (!userMessage) return;
+
+    inputRef.current.value = "";
+    console.log(userMessage);
+
+    // Add user message
+    setChatHistory((history) => [
+      ...history,
+      { role: "user", text: userMessage },
+    ]);
+
+    // Add "thinking..." placeholder
+    const thinkingIndex = chatHistory.length + 1;
+    setChatHistory((history) => [
+      ...history,
+      { role: "model", text: "thinking..." },
+    ]);
+
+    // Await Tina's response
+    const tinaReply = await generateTinasResponse([
+      ...chatHistory,
+      { role: "user", text: userMessage },
+    ]);
+
+    // Replace "thinking..." with actual reply
+    setChatHistory((prev) => {
+      const updated = [...prev];
+      updated[thinkingIndex] = { role: "model", text: tinaReply };
+      return updated;
+    });
+  };
+
   return (
     <div>
       <form
         action="#"
-        className="flex item-center bg-white outline outline-2 outline-violet-400 rounded-xl"
+        className="flex items-center bg-white outline outline-2 outline-violet-400 rounded-xl"
+        onSubmit={handleFormSubmit}
       >
         <input
+          ref={inputRef}
           type="text"
           placeholder="enter your message here."
           required
