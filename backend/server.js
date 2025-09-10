@@ -14,7 +14,7 @@ require("dotenv").config();
 const API_KEY = process.env.GEMINI_API_KEY;
 
 // middleware
-app.use(cors({ origin: "http://localhost:5174" }));
+app.use(cors({ origin: "http://localhost:5173" }));
 
 // init Gemini client
 const generativeAI = new GoogleGenerativeAI(API_KEY);
@@ -22,20 +22,24 @@ const generativeAI = new GoogleGenerativeAI(API_KEY);
 // define Gemini model
 const model = generativeAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
+let chatSession = null;
+
 // define Tina's persona //
 async function generateTinaReply(userText) {
-  const chat = await model.startChat({
-    history: [],
-    systemInstruction: {
-      role: "system",
-      parts: [{ text: promptTina }],
-    },
-  });
+  if (!chatSession) {
+    chatSession = await model.startChat({
+      history: [],
+      systemInstruction: {
+        role: "system",
+        parts: [{ text: promptTina }],
+      },
+    });
+  }
 
   console.log("👉 Sending to Gemini:", userText);
   console.log("Type of userText:", typeof userText);
 
-  const result = await chat.sendMessage(userText);
+  const result = await chatSession.sendMessage(userText);
 
   return result.response.text();
 }
