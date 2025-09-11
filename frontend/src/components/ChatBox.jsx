@@ -4,25 +4,31 @@ import ChatForm from "./ChatForm";
 import ChatMessage from "./ChatMessage";
 
 export default function ChatBox({ onClose }) {
-  const [chatHistory, setChatHistory] = useState([]);
-  const bottomRef = useRef(null);
+  const [chatHistory, setChatHistory] = useState([]); // store transcripts
+  const bottomRef = useRef(null); // scroll to the bottom
 
+  // scroll to bottom whenever chatHistory updates / think of new msg
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
+  // handles backend call to generate Tina's response
   const generateTinasResponse = async (history) => {
     console.log(history);
     try {
+      // extract latest user message from history
       const latestUserMessage = history
+        // create new array containing only msg sent by user. and filters out Tina's reply.
         .filter((h) => h.role === "user")
+        // removes and return the last msg from this filtered aray
+        // the n use optional chaining to access .text property
         .pop()?.text;
 
       if (!latestUserMessage) {
         throw new Error("No user message found.");
       }
 
-      // send to backend
+      // send msg to backend API using fetch
       const res = await fetch("http://localhost:3000/recommendation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,7 +36,7 @@ export default function ChatBox({ onClose }) {
       });
 
       const data = await res.json();
-
+      // error handling
       if (!res.ok)
         throw new Error(
           data.error.message || "Something not quite right here. "
@@ -44,15 +50,15 @@ export default function ChatBox({ onClose }) {
   };
 
   return (
-    // chatbox container
+    // ---- CHATBOX CONTAINER ----
     <div>
       {/* pop up */}
       <div className="flex flex-col h-[600px] bg-white w-150 rounded-3xl shadow-2xl overflow-hidden">
-        {/* CHATBOX HEADER */}
+        {/* ---- CHATBOX HEADER ---- */}
         <div className="flex relative items-center justify-between bg-fuchsia-600 text-white py-4 px-6">
           {/* header info */}
           <div className="flex items-center gap-[10px] ">
-            {/* Tina's profile pic */}
+            {/* Tina's avatar */}
             <ChatBotLogo />
             <h2 className="font-extrabold text-xl">
               Tina - The Turner's Chatbot
@@ -66,7 +72,7 @@ export default function ChatBox({ onClose }) {
           </button>
         </div>
 
-        {/* CHATBOX BODY */}
+        {/* ---- CHATBOX BODY ---- */}
         <div className="flex-grow gap-[5px] overflow-y-auto py-4 px-6 scroll-smooth">
           {/* message - bot message */}
           <div className="flex items-center gap-[11px] max-w-[75%] px-2 py-2 text-sm ">
@@ -77,7 +83,7 @@ export default function ChatBox({ onClose }) {
             </div>
           </div>
 
-          {/* render chat history */}
+          {/* renders dynamic chat history */}
           {chatHistory.map((chat, index) => {
             return <ChatMessage key={index} chat={chat} />;
           })}
