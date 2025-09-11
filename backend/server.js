@@ -36,7 +36,6 @@ async function generateTinaReply(userText) {
     });
   }
 
-  console.log("👉 Sending to Gemini:", userText);
   console.log("Type of userText:", typeof userText);
 
   const result = await chatSession.sendMessage(userText);
