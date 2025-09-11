@@ -20,7 +20,7 @@ app.use(cors({ origin: "http://localhost:5173" }));
 const generativeAI = new GoogleGenerativeAI(API_KEY);
 
 // define Gemini model
-const model = generativeAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+const model = generativeAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 let chatSession = null;
 

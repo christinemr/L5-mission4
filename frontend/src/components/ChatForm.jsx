@@ -1,40 +1,44 @@
 import React, { useRef } from "react";
 
+// handle user's input and triggers Tina's response
 export default function ChatForm({
   chatHistory,
   setChatHistory,
   generateTinasResponse,
 }) {
-  const inputRef = useRef();
+  const inputRef = useRef(); // useRef to access the DOM / input field directly
 
+  // handle form submission
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const userMessage = inputRef.current.value.trim();
     if (!userMessage) return;
 
-    inputRef.current.value = "";
-    console.log(userMessage);
+    inputRef.current.value = ""; // clear input field
+    console.log(userMessage); // see input msg
 
-    // Add user message
+    // Add user message to chat history
     setChatHistory((history) => [
       ...history,
       { role: "user", text: userMessage },
     ]);
 
-    // Add "thinking..." placeholder
+    // placeholder whilst Tina's thinking
     const thinkingIndex = chatHistory.length + 1;
     setChatHistory((history) => [
       ...history,
       { role: "model", text: "thinking..." },
     ]);
 
-    // Await Tina's response
+    // call backend to generate Tina's response
     const tinaReply = await generateTinasResponse([
       ...chatHistory,
       { role: "user", text: userMessage },
     ]);
 
-    // Replace "thinking..." with actual reply
+    // Replace "thinking..." placeholder with Tina's actual reply
+    // Use functional state update to ensure latest chat history
+    // store previous chat history into a new variable to avoid mutating React state directly
     setChatHistory((prev) => {
       const updated = [...prev];
       updated[thinkingIndex] = { role: "model", text: tinaReply };
